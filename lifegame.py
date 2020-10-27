@@ -1,6 +1,6 @@
 import pygame,sys,random,time
 import numpy as np
-
+#cambio
 pygame.init()
 
 tSize = 10
