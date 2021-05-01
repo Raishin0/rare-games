@@ -66,7 +66,7 @@ while True:
             posM[0] = int((posM[0])/tSize)
             posM[1] = int((posM[1])/tSize)
             tiles[posM[0]][posM[1]] = pygame.mouse.get_pressed()[0]
-
+        draw()
     else:
         for x in range(mapsizeX):
             for y in range(mapsizeY):
@@ -78,8 +78,7 @@ while True:
                 else:
                     newTiles[x][y] = 0
         tiles = newTiles 
-
-    draw()
-
-    time.sleep(0.1)
+        draw()
+        time.sleep(0.1)
+    
     pygame.display.flip()
