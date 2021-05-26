@@ -1,4 +1,4 @@
-import pygame
+import pygame,sys
 pygame.init()
 
 width, height = 400, 400
