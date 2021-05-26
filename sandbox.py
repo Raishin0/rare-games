@@ -6,10 +6,12 @@ import numpy as np
 FPS = 15
 tSize = 5
 mapsizeX, mapsizeY = 100, 100
+size = mapsizeX*tSize, mapsizeY*tSize
+UIspace = 60
 # width, height = mapsizeX*tSize, mapsizeY*tSize
 # screen = pygame.display.set_mode((width, height))
 flags = pygame.RESIZABLE
-screen = pygame.display.set_mode((mapsizeX*tSize, mapsizeY*tSize),flags)
+screen = pygame.display.set_mode((size[0]+UIspace, size[1]),flags)
 game_screen = pygame.Surface((mapsizeX, mapsizeY))
 colorbg = 127, 127, 127
 colors = {
@@ -28,9 +30,13 @@ mode = 2
 screen.fill(colorbg)
 clock = pygame.time.Clock()
 pixels = pygame.PixelArray(game_screen)
-
+check = 5
 def checkPos(x, y, newtiles):
     global tiles
+    global check
+    if(check > 0 and y == 0):
+        check -= 1
+        print(y)
     if y < mapsizeY-1 and newtiles[x][y] == 1:
         if newtiles[x][y+1] == 0:
             newtiles[x][y+1] = 1
@@ -61,30 +67,40 @@ def draw():
 
 draw()
 pygame.display.flip()
-state = False
+register = False
 painting = False
 while True:    
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
         if event.type == pygame.MOUSEBUTTONDOWN:
-            painting = 1
+            if event.button == 1:
+                painting = 1
+            if event.button == 3:
+                register = 1
         if event.type == pygame.MOUSEBUTTONUP:
-            painting = 0
+            if event.button == 1:
+                painting = 0
+            if event.button == 3:
+                register = 0
     
+    posM = list(pygame.mouse.get_pos())
+    posM[0] = int((posM[0])/tSize)
+    posM[1] = int((posM[1])/tSize)
     if painting == 1:
-        posM = list(pygame.mouse.get_pos())
-        posM[0] = int((posM[0])/tSize)
-        posM[1] = int((posM[1])/tSize)
         tiles[posM[0]][posM[1]] = mode
+
+    if register == 1:
+        print(str(posM) + " "+ str(tiles[posM[0]][posM[1]]))
+
 
     newTiles = np.copy(tiles)
     for x in range(mapsizeX):
         for y in range(mapsizeY):
-            checkPos(x, mapsizeY-y, newTiles)
+            checkPos(x, mapsizeY-y-1, newTiles)
 
     tiles = newTiles 
     draw()
     clock.tick(FPS)
     # pygame.transform.scale(game_screen, screen.get_size())
-    screen.blit(pygame.transform.scale(game_screen, screen.get_size()), (0, 0))
+    screen.blit(pygame.transform.scale(game_screen, size), (0, 0))
     pygame.display.flip()
