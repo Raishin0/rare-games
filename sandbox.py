@@ -58,6 +58,8 @@ def checkPos(x, y, newtiles):
 
 
 def draw():
+    global mode
+    global colors
     for x in range(mapsizeX):
         for y in range(mapsizeY):
             # X = x*tSize
@@ -68,13 +70,10 @@ def draw():
             pixels[x][y] = color
 
 class Button :
-    def __init__(self, text,  pos, font, bg="black", feedback=""):
+    def __init__(self, text,  pos, bg="black", mode=1):
         self.x, self.y = pos
-        self.font = pygame.font.SysFont("Arial", font)
-        if feedback == "":
-            self.feedback = "text"
-        else:
-            self.feedback = feedback
+        self.font = pygame.font.SysFont("Arial", 20)
+        self.mode = mode
         self.change_text(text, bg)
 
     def change_text(self, text, bg="black"):
@@ -90,18 +89,21 @@ class Button :
         screen.blit(self.surface, (self.x, self.y))
 
     def click(self, event):
+        global mode
         x, y = pygame.mouse.get_pos()
         if event.type == pygame.MOUSEBUTTONDOWN:
             if pygame.mouse.get_pressed()[0]:
                 if self.rect.collidepoint(x, y):
-                    self.change_text(self.feedback, bg="red")
+                    mode = self.mode
 
-button1 = Button("Arena",(size[0]+8,20),20,bg=colors[1],feedback="hola")
+button1 = Button("Tierra",(size[0]+8,20),bg=colors[1],mode=1)
+button2 = Button("Arena",(size[0]+8,60),bg=colors[2],mode=2)
 draw()
 pygame.display.flip()
 register = False
 painting = False
 while True:    
+    screen.fill(colorbg)
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -115,15 +117,16 @@ while True:
             if event.button == 3:
                 register = 0
         button1.click(event)
+        button2.click(event)
     posM = list(pygame.mouse.get_pos())
     posM[0] = int((posM[0])/tSize)
     posM[1] = int((posM[1])/tSize)
     if painting == 1:
-        tiles[posM[0]][posM[1]] = mode
+        if posM[0] < mapsizeX:
+            tiles[posM[0]][posM[1]] = mode
 
     if register == 1:
         print(str(posM) + " "+ str(tiles[posM[0]][posM[1]]))
-
 
     newTiles = np.copy(tiles)
     for x in range(mapsizeX):
@@ -135,6 +138,9 @@ while True:
     clock.tick(FPS)
     # pygame.transform.scale(game_screen, screen.get_size())
     screen.blit(pygame.transform.scale(game_screen, size), (0, 0))
+    font = pygame.font.SysFont(None, 24)
+    img = font.render(str(mode), True, colors[2])
+    screen.blit(img, (size[0], 0))
     button1.show()
-
+    button2.show()
     pygame.display.flip()
