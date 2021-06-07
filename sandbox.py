@@ -2,21 +2,23 @@ import pygame
 import sys
 import random
 import numpy as np
-# cambio
-FPS = 15
+pygame.font.init()
+
 tSize = 5
 mapsizeX, mapsizeY = 100, 100
 size = mapsizeX*tSize, mapsizeY*tSize
 UIspace = 60
-# width, height = mapsizeX*tSize, mapsizeY*tSize
-# screen = pygame.display.set_mode((width, height))
 flags = pygame.RESIZABLE
 screen = pygame.display.set_mode((size[0]+UIspace, size[1]),flags)
 game_screen = pygame.Surface((mapsizeX, mapsizeY))
+pixels = pygame.PixelArray(game_screen)
+clock = pygame.time.Clock()
+FPS = 15
+
 colorbg = 127, 127, 127
 colors = {
         0: (0, 0, 0),
-        1: (255, 0, 0),
+        1: (109, 46, 18),
         2: (255, 255, 0)
         }
 tiles = [[0 for i in range(mapsizeX)] for j in range(mapsizeY)]
@@ -27,19 +29,7 @@ mode = 2
 2-arena
 """
 
-screen.fill(colorbg)
-clock = pygame.time.Clock()
-
-pygame.font.init()
-
-pixels = pygame.PixelArray(game_screen)
-check = 5
 def checkPos(x, y, newtiles):
-    global tiles
-    global check
-    if(check > 0 and y == 0):
-        check -= 1
-        print(y)
     if y < mapsizeY-1 and newtiles[x][y] == 1:
         if newtiles[x][y+1] == 0:
             newtiles[x][y+1] = 1
@@ -62,11 +52,7 @@ def draw():
     global colors
     for x in range(mapsizeX):
         for y in range(mapsizeY):
-            # X = x*tSize
-            # Y = y*tSize
-            # pos = ((X+1, Y+1), (tSize-1, tSize-1))
             color = colors[tiles[x][y]]
-            # pygame.draw.rect(screen, color, pos)
             pixels[x][y] = color
 
 class Button :
@@ -96,10 +82,14 @@ class Button :
                 if self.rect.collidepoint(x, y):
                     mode = self.mode
 
-button1 = Button("Tierra",(size[0]+8,20),bg=colors[1],mode=1)
-button2 = Button("Arena",(size[0]+8,60),bg=colors[2],mode=2)
+buttons = list()
+buttons.append(Button("Tierra",(size[0]+8,20),bg=colors[1],mode=1))
+buttons.append(Button("Arena",(size[0]+8,60),bg=colors[2],mode=2))
+
+screen.fill(colorbg)
 draw()
 pygame.display.flip()
+
 register = False
 painting = False
 while True:    
@@ -116,8 +106,8 @@ while True:
                 painting = 0
             if event.button == 3:
                 register = 0
-        button1.click(event)
-        button2.click(event)
+        buttons[0].click(event)
+        buttons[1].click(event)
     posM = list(pygame.mouse.get_pos())
     posM[0] = int((posM[0])/tSize)
     posM[1] = int((posM[1])/tSize)
@@ -136,11 +126,12 @@ while True:
     tiles = newTiles 
     draw()
     clock.tick(FPS)
-    # pygame.transform.scale(game_screen, screen.get_size())
     screen.blit(pygame.transform.scale(game_screen, size), (0, 0))
+
     font = pygame.font.SysFont(None, 24)
-    img = font.render(str(mode), True, colors[2])
+    img = font.render(str(mode), True, colors[0])
     screen.blit(img, (size[0], 0))
-    button1.show()
-    button2.show()
+    buttons[0].show()
+    buttons[1].show()
+
     pygame.display.flip()
