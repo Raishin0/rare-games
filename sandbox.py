@@ -60,11 +60,14 @@ class Button :
         self.x, self.y = pos
         self.font = pygame.font.SysFont("Arial", 20)
         self.mode = mode
-        self.change_text(text, bg)
+        self.textRaw = text
+        self.bg = bg
+        self.pressed = 0
+        self.change(bg)
 
-    def change_text(self, text, bg="black"):
+    def change(self, bg="black"):
         """Change the text when you click"""
-        self.text = self.font.render(text, 1, pygame.Color("White"))
+        self.text = self.font.render(self.textRaw, 1, pygame.Color("White"))
         self.size = self.text.get_size()
         self.surface = pygame.Surface(self.size)
         self.surface.fill(bg)
@@ -72,6 +75,10 @@ class Button :
         self.rect = pygame.Rect(self.x, self.y, self.size[0], self.size[1])
 
     def show(self):
+        if mode == self.mode:
+            self.change(self.bg)
+        else:
+            self.change()
         screen.blit(self.surface, (self.x, self.y))
 
     def click(self, event):
